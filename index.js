@@ -49,6 +49,12 @@ socket.on('message', function (message){
     //   checkAndStart();
     // }
     peerSockets.push(message.senderId)
+
+    let video = document.createElement('video');
+    video.id = message.senderId;
+    video.autoplay = true;
+    document.getElementById("videoContainer").appendChild(video)
+
     pc[message.senderId] = new RTCPeerConnection(pc_config, pc_constraints);
     pc[message.senderId].addStream(localStream);
     pc[message.senderId].onicecandidate = function (event) {
@@ -63,7 +69,12 @@ socket.on('message', function (message){
                 console.log('End of candidates.');
               }
             }
-   pc[message.senderId].onaddstream = handleRemoteStreamAdded
+   pc[message.senderId].onaddstream = function (event) {
+                       console.log('Remote stream added.');
+                       attachMediaStream(video, event.stream);
+                       // console.log('Remote stream attached!!.');
+                       // remoteStream = event.stream;
+                     }
 
 
 
@@ -117,6 +128,11 @@ function createPeerConnection() {
   try {
 
     for(let i=0; i<peerSockets.length; i++){
+      let video = document.createElement('video');
+      video.id = peerSockets[i];
+      video.autoplay = true;
+      document.getElementById("videoContainer").appendChild(video)
+
       pc[peerSockets[i]] = new RTCPeerConnection(pc_config, pc_constraints);
       pc[peerSockets[i]].addStream(localStream);
       pc[peerSockets[i]].onicecandidate = function (event) {
@@ -131,7 +147,13 @@ function createPeerConnection() {
                   console.log('End of candidates.');
                 }
               }
-     pc[peerSockets[i]].onaddstream = handleRemoteStreamAdded
+     pc[peerSockets[i]].onaddstream = function (event) {
+                         console.log('Remote stream added.');
+                         attachMediaStream(video, event.stream);
+                         // console.log('Remote stream attached!!.');
+                         // remoteStream = event.stream;
+                       }
+
     }
 
     // console.log('Created RTCPeerConnnection with:\n' +
